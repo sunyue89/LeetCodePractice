@@ -1,5 +1,4 @@
-/*
-There are a total of numCourses courses you have to take, labeled from 0 to numCourses-1.
+/*There are a total of numCourses courses you have to take, labeled from 0 to numCourses-1.
 
 Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
 
@@ -27,43 +26,50 @@ Constraints:
 The input prerequisites is a graph represented by a list of edges, not adjacency matrices. Read more about how a graph is represented.
 You may assume that there are no duplicate edges in the input prerequisites.
 1 <= numCourses <= 10^5
-*/
+Last Submission
+Last Saved Code*/
+
 
 class Solution {
 public:
-    vector<vector<int>> makeGraph(int numCourses,vector<vector<int>>& prerequisites){
-        vector<vector<int>> graph(numCourses); 
-        for(int i=0; i<prerequisites.size(); ++i){
-            graph[prerequisites[i][0]].push_back(prerequisites[i][1]);
+    /*
+    vector<vector<int>> makeGraph(int numCourses, vector<vector<int>>& prerequisites){
+        vector<vector<int>> g(numCourses);
+        for(const auto& p:prerequisites){
+            g[p[0]].push_back(p[1]);
         }
-        return graph;
-    }
-    bool DFS_Cycle(int n, vector<vector<int>>& graph, vector<bool>& vis, vector<bool>& par){
-        if(vis[n]==false){
-            vis[n] = true;
-            par[n] = true;
-            for(int i=0; i<graph[n].size(); ++i){
-                //cout<<n<< graph[n][i]<< vis[graph[n][i]]<< par[graph[n][i]]<<endl;
-                if(!vis[graph[n][i]] && DFS_Cycle(graph[n][i],graph,vis,par)){
-                    return true;
-                }else{
-                    if(par[graph[n][i]])
-                        return true;
-                }
-            }
-        }
-        par[n] = false;
-        return false;
-    }
+        return g;
+    }*/
+public:
     bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
-        vector<vector<int>> graph = makeGraph(numCourses,prerequisites);
-        vector<bool> par(numCourses,false);
-        vector<bool> vis(numCourses,false);
         
-        for(int i=0;i<numCourses;++i){
-            if(DFS_Cycle(i,graph,vis,par))
-                return false;
-        }
+        graph_ = vector<vector<int>>(numCourses);
+        
+        for(const auto& p : prerequisites)
+            graph_[p[0]].push_back(p[1]);
+        
+        // states: 0 = unkonwn, 1 == visiting, 2 = visited
+        vector<int> v(numCourses, 0);
+        
+        for(int i = 0; i < numCourses; ++i)
+            if(dfs(i, v)) return false;
+        
         return true;
+    }
+    
+private:
+    vector<vector<int>> graph_;
+    bool dfs(int cur, vector<int>& v) {
+        if(v[cur] == 1) return true;
+        if(v[cur] == 2) return false;
+        
+        v[cur] = 1;
+        
+        for(const int t : graph_[cur])
+            if(dfs(t, v)) return true;
+        
+        v[cur] = 2;
+        
+        return false;
     }
 };
